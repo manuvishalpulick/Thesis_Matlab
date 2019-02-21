@@ -9,12 +9,9 @@ k_dom_lsa = 0.6586;                                                         % LS
 omega = @(k) (-ho.^3.*k.^4) + (k.^2.*(1/ho)) - (0.4/3.*k.^2.*(1/ho.^2));    %dispersion relation
 marker = ['*','o','+','d','.'];
 colour = ['r','g','b','c','b'];
-%% initialization of heterogeneous parameters
-wave_dom_lsa=9.54;   % Prediction from theory  
+%% Heterogeneity initialization    
 e= [ 0,0.05,0.1,0.3,0.4,0.5,0.6,0.7];
-P_het=4; 
-Pc = wave_dom_lsa./sqrt(2);     % Critical wavelength from theory
-ratio_het = P_het/Pc;          % Ratio of Phet:Pc
+P_het=0; 
 %% Simulation parameters
 
     c=2.75;
@@ -25,7 +22,7 @@ ratio_het = P_het/Pc;          % Ratio of Phet:Pc
 
 t_ruptavg = zeros(1,max(size(e)));
 t_calc_avg = zeros(1,max(size(e)));
-  for im = 5:5 %max(size(e)) 
+  for im = 1:1 %max(size(e)) 
       if e == 0.0
             strhet='homogeneous';
             het=0;
@@ -40,7 +37,7 @@ t_calc_avg = zeros(1,max(size(e)));
       end
     fprintf('The parameters for the current simulation are:\n L=%d,deltaX=%d,deltaT=%d\n',L_flat,deltaX,deltaX^c)
     fprintf('Heterogeneity parameters are:\n P_het= %d, e = %d\n',P_het,e(im))
-    [t_ruptavg(im) ,t_calc_avg(im)] = thin_films(L_flat,deltaX,c,P_het,e(im),Tmp,wave_dom_lsa);
+    [t_ruptavg(im) ,t_calc_avg(im)] = thin_films(L_flat,deltaX,c,P_het,e(im),Tmp);
   end 
 figure  
 plot(e,t_ruptavg,'b')
@@ -56,7 +53,7 @@ title('Amplitude of wettability vs Simulation time','Fontsize',10)
 savefig('sim_timeplot.fig')
 end
 
-function [t_ruptavg ,t_calcavg] = thin_films(L_flat,deltaX,c,P_het,e,Tmp,wave_dom_lsa)
+function [t_ruptavg ,t_calcavg] = thin_films(L_flat,deltaX,c,P_het,e,Tmp)
 
 kappa = 0.0;         % dimensionless curvature (= 0 for flat films)
                      
@@ -73,6 +70,10 @@ L = L_curv + L_flat;   % total length of the film (curved+flat)  Still L_flat fo
 N = round(L/deltaX);   % adjusted number of grid points -- different from earlier value of N only for curved films 
 deltaT = deltaX^c;          % time step size
 deltaX;
+%% initialization of heterogeneous parameters
+wave_dom_lsa=9.54;   % Prediction from theory
+Pc = wave_dom_lsa./sqrt(2);     % Critical wavelength from theory
+ratio_het = P_het/Pc;          % Ratio of Phet:Pc
 
 %Please note that domain length has to be a multiple of P_het or else we
 %would not be able to make it periodic
@@ -260,7 +261,7 @@ tt = seN*deltaT;                % time between saving two files
         for realization = 1:N_Reals  
             t_rupt(realization)=44.5674; % If simulation data file was not created
 %             file = strcat(strhet,'*rzn',num2str(realization),'.mat');
-             mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));
+%             mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));
 %             str2 = strcat('./',mk,'/',file);
 %             load(str2,'t_rupt'); % reading rupture time to pass to post processor
 %             t_rupt=t_rupt(realization);

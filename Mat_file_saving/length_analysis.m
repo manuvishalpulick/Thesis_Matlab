@@ -4,62 +4,112 @@ clear all
 close all
 clc
 
-k_dom_lsa = 0.6586;                                                         % LSA prediction of dom wave number  
+k_dom_lsa = 0.6586;     % LSA prediction of dom wave number  
+ho=1;
+error_index = 1;  % Assign 1 if you are performing error analysis
 %% initializing plot properties
-omega = @(k) (-ho.^3.*k.^4) + (k.^2.*(1/ho)) - (0.4/3.*k.^2.*(1/ho.^2));    %dispersion relation
+omega = @(k) (-ho.^3.*k.^4) + (k.^2.*(1/ho)) - (0.4/3.*k.^2.*(1/ho.^2));  %dispersion relation
 marker = ['*','o','+','d','.'];
-colour = ['r','g','b','c','b'];
-%% initialization of heterogeneous parameters
-wave_dom_lsa=9.54;   % Prediction from theory  
-e= [ 0,0.05,0.1,0.3,0.4,0.5,0.6,0.7];
-P_het=4; 
-Pc = wave_dom_lsa./sqrt(2);     % Critical wavelength from theory
-ratio_het = P_het/Pc;          % Ratio of Phet:Pc
+colour = ['r','g','b','c','m'];
 %% Simulation parameters
 
-    c=2.75;
-    L_flat = 60;   %length of domain
+    %L_flat = [20, 30, 35, 40, 50, 60, 70, 80, 90, 100, 120, 130, 140, 150, 160, 170, 180, 190, 200, 220]; 
+    %deltaX = [0.025,0.05,0.1,0.125];
+    L_flat =[ 20:20:240 ];
+    %L_flat = 57;
+    deltaX = 0.05;
+    %legend_string = [num2str(deltaX(1)),num2str(deltaX(2)),num2str(deltaX(3)),num2str(deltaX(4))];
+    c = [2.75];     %DeltaT parameter
+    %L_flat = L_flat_array(5);   %length of domain
     Tmp=0.000; % Dimensionless Noise 
-  
+%% Heterogeneity initialization    
+e=0.4;
+P_het=0;   
 
-
-t_ruptavg = zeros(1,max(size(e)));
-t_calc_avg = zeros(1,max(size(e)));
-  for im = 5:5 %max(size(e)) 
-      if e == 0.0
+if e == 0.0
             strhet='homogeneous';
             het=0;
-    else
+else
             strhet='heterogeneous';
             het=1;
-      end
-      if e(im) < 0.7
-        deltaX = 0.05;
-    else
-        deltaX = 0.025
-      end
-    fprintf('The parameters for the current simulation are:\n L=%d,deltaX=%d,deltaT=%d\n',L_flat,deltaX,deltaX^c)
-    fprintf('Heterogeneity parameters are:\n P_het= %d, e = %d\n',P_het,e(im))
-    [t_ruptavg(im) ,t_calc_avg(im)] = thin_films(L_flat,deltaX,c,P_het,e(im),Tmp,wave_dom_lsa);
-  end 
-figure  
-plot(e,t_ruptavg,'b')
-xlabel('Amplitude of heterogeneity','Fontsize',10)
-ylabel('Rupture time','Fontsize',10)
-title('Amplitude of wettability vs Ruptute time','Fontsize',10)
-savefig('rupture_timeplot.fig')
-figure
-plot(e,t_calc_avg,'b')
-xlabel('Amplitude of heterogeneity','Fontsize',10)
-ylabel('Simulation time','Fontsize',10)
-title('Amplitude of wettability vs Simulation time','Fontsize',10)  
-savefig('sim_timeplot.fig')
+end
+%%    
+    
+    for iter_l = 1:max(size(L_flat)) % for deltaX change
+            tic
+            P_het = L_flat(iter_l)/6; 
+            [t_ruptavg(iter_l),t_calc_avg(iter_l)]=thin_films(L_flat(iter_l),deltaX,c,P_het,e,Tmp);
+            toc
+        end
+        %% To ignore all zero entries
+%         deltaT(:,all(deltaT==0)) = [];
+%         deltaT(all(deltaT==0,2),:) = [];
+%         t_ruptavg(:,all(t_ruptavg==0)) = [];
+%         t_ruptavg(all(t_ruptavg==0,2),:) = [];
+%         k_dom_sim(:,all(k_dom_sim==0)) = [];
+%         k_dom_sim(all(k_dom_sim==0,2),:) = [];
+%         omega_max_sim(:,all(omega_max_sim==0)) = [];
+%         omega_max_sim(all(omega_max_sim==0,2),:) = [];
+       
+        if error_index == 1        
+            truptfig = figure(1);
+            plot(L_flat(:),t_ruptavg(:),'Color',colour(5),'Marker',marker(2))
+            xlabel('L')
+            ylabel('time of rupture')
+            title('Time of rupture change with L')
+            %hold on
+            %legend(strcat('deltaX=',num2str(deltaX(1))),strcat('deltaX=',num2str(deltaX(2))),strcat('deltaX=',num2str(deltaX(3))),strcat('deltaX=',num2str(deltaX(4))),'Location','southeast');
+            %legend(strcat('L=',num2str(L_flat(1))),strcat('L=',num2str(L_flat(2))),strcat('L=',num2str(L_flat(3))),strcat('L=',num2str(L_flat(4))),strcat('L=',num2str(L_flat(5))),'Location','southeast');
+            %err_k(:) = sqrt((k_dom_sim(:) - k_dom_lsa).^2);
+            %err_omega_norm(:) = sqrt((omega(k_dom_lsa) - omega_max_sim(:))).^2;
+            %err_kfig = figure(2);
+%             plot(L_flat(:),err_k(:),'Color',colour(3),'Marker',marker(1))
+%             xlabel('L')
+%             ylabel('error in dominant wave number')
+%             title('Wave number error change with L')
+            %legend(strcat('L=',num2str(L_flat(1))),strcat('L=',num2str(L_flat(2))),strcat('L=',num2str(L_flat(3))),strcat('L=',num2str(L_flat(4))),strcat('L=',num2str(L_flat(5))),'Location','southeast');
+            %legend(strcat('L=',num2str(L_flat(iter_l))),'Location','southeast');
+%             hold on
+%             err_omegafig = figure(3);
+%             plot( L_flat(:),err_omega_norm(:),'Color',colour(4),'Marker',marker(4))
+%             xlabel('deltaT')
+%             ylabel('error in growth rate')
+%             title('Growth rate error change with deltaT')
+            %legend(strcat('L=',num2str(L_flat(1))),strcat('L=',num2str(L_flat(2))),strcat('L=',num2str(L_flat(3))),strcat('L=',num2str(L_flat(4))),strcat('L=',num2str(L_flat(5))),'Location','southeast');
+            %legend(strcat('deltaX=',num2str(deltaX(iter_p))),'Location','southeast');
+            hold on
+            %[err_min,min_index] = min(err_omega_norm(iter_p,:));
+            %c_min(iter_p) = c(min_index);
+            t_calc_fig = figure(2);
+            plot( L_flat(:),t_calc_avg(:),'Color',colour(5),'Marker',marker(2))
+            xlabel('deltaT')
+            ylabel('Time of simulation')
+            title('Simulation time with deltaT')
+            %legend(strcat('L=',num2str(L_flat(1))),strcat('L=',num2str(L_flat(2))),strcat('L=',num2str(L_flat(3))),strcat('L=',num2str(L_flat(4))),strcat('L=',num2str(L_flat(5))),'Location','southeast');
+            %legend(strcat('deltaX=',num2str(deltaX(iter_p))),'Location','northeast');
+        end
+    
+    
+    if error_index ==1
+        save(strcat('Errors_L',num2str(deltaX),num2str(c),'.mat'),'err_k','err_omega_norm','t_ruptavg','k_dom_sim')
+        savefig(strcat('truptfig',num2str(deltaX),num2str(c),'.fig'))
+        %savefig(strcat('err_kfig',num2str(deltaX),num2str(c),'.fig'))
+        %savefig(strcat('err_omegafig',num2str(deltaX),num2str(c),'.fig'))
+        savefig(strcat('t_calcfig',num2str(deltaX),num2str(c),'.fig'))
+        mk2 = strcat(strhet,'_deltaX_',num2str(deltaX),'c',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));
+        movefile('Errors*',mk2)
+        %movefile('err_*',mk2)
+        movefile('truptfig*',mk2)
+        movefile('t_calcfig*',mk2)
+    end
+    
 end
 
-function [t_ruptavg ,t_calcavg] = thin_films(L_flat,deltaX,c,P_het,e,Tmp,wave_dom_lsa)
+function [t_ruptavg ,t_calcavg] = thin_films(L_flat,deltaX,c,P_het,e,Tmp)
 
-kappa = 0.0;         % dimensionless curvature (= 0 for flat films)
-                     
+kappa = 0.0;                                                                % dimensionless curvature (= 0 for flat films)
+
+%deltaX = 0.05                                                              % grid/mesh size
 if kappa == 0  
     L_curv = 0;      % conditions for flat films
     x = 0:deltaX:L_flat;        % domain for flat films
@@ -72,11 +122,13 @@ end
 L = L_curv + L_flat;   % total length of the film (curved+flat)  Still L_flat for flat films
 N = round(L/deltaX);   % adjusted number of grid points -- different from earlier value of N only for curved films 
 deltaT = deltaX^c;          % time step size
-deltaX;
-
-%Please note that domain length has to be a multiple of P_het or else we
-%would not be able to make it periodic
-% If P_het has to be determined by the ratio
+deltaX
+%% initialization of heterogeneous parameters
+wave_dom_lsa=9.54;   % Prediction from theory
+Pc = wave_dom_lsa./sqrt(2);     % Critical wavelength from theory
+%P_het= 0;          %Periodicity of heterogeneity
+ratio_het = P_het/Pc;          % Ratio of Phet:Pc
+%e=0.0;  %Amplitude of wettability
 %P_het= ratio_het.*Pc;          %Periodicity of heterogeneity
 
 N_nodes_het = round(N/(L_flat/P_het));  % No of nodes in one heterogeneous stripe
@@ -121,17 +173,12 @@ else
     end
 end
 
-seN = 40000;              % save every these many time steps    
+seN = 5000;              % save every these many time steps    
 realization = 0;                % counter for the number of realizations
 t_rupt = zeros(N_Reals,1);      % preallocate rupture times vector
 tt = seN*deltaT;                % time between saving two files
 
-
-
     if post_pro == 0
-        %% make directory for saving results
-        mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));  % name your realization folder
-        mk2 = mkdir(mk);                                  % make its directory
         %% Allocation of space for making A and B matrices for solving
                 h_adjusted=N+5;         % 2 ghost points on each side and extra 1 for the additional grid point (for x=0)
                 % preallocate sparse matrix below: the right most entry is for
@@ -175,8 +222,6 @@ tt = seN*deltaT;                % time between saving two files
                 fprintf('Time taken by the flatFilms solver: %d min %f s\n',floor(t_calc(m)/60),mod(t_calc(m),60))
 %                 reali_series(m) = m;                    % to keep a log of the realization (not needed, but I keep it)
 %                 realization = realization + 1;          % counter
-                movefile('*.mat',mk)
-                post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_rupt(m), het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);  
             
             end
             %% following is for non-flat simulations (quite similar to the flat ones, except for the boundary conditions
@@ -205,8 +250,8 @@ tt = seN*deltaT;                % time between saving two files
 
                 reali_series(m) = m;
                 realization = realization + 1;
+                %post_processor_saved(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_rupt(m), het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);  
 
-                
             end
         end
         tpp = tic;
@@ -238,10 +283,12 @@ tt = seN*deltaT;                % time between saving two files
         %% store the data (but more importantly the rupture times) into a .mat file, so that there is no further post processing required if we are just looking for T_r
         filename = ['simulationdata_','kappa_',num2str(kappa),'_Lf_',num2str(L),'_N_',num2str(N), '_Tmp_', num2str(Tmp),'.mat'];
         save(filename,'t_ruptavg','k_dom_sim_avg','S_t_rupt','S_k_dom_sim','t_calcavg','S_t_calc')   % saves the .mat file including all the variable values in a filename of the specified format
-        movefile('*.mat',mk)
-                              % move all the data files to that directory
+        
+        mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));  % name your realization folder
+        mk2 = mkdir(mk);                                  % make its directory
+        movefile('*.mat',mk)                              % move all the data files to that directory
         a=0;
-        R_f = 65e-6;                    % radius of flat surface
+        R_f = 65e-6;                     % radius of flat surface
         h0_init = 150e-9;                % initial height =150nm
         A_vw = 2.026e-20;
         gam = 0.034;                     %for length scale calculation
@@ -258,14 +305,14 @@ tt = seN*deltaT;                % time between saving two files
         fprintf('Time taken for post processing: %d min %f s\n',floor(tElapsed_pp/60),mod(tElapsed_pp,60))
     else
         for realization = 1:N_Reals  
-            t_rupt(realization)=44.5674; % If simulation data file was not created
-%             file = strcat(strhet,'*rzn',num2str(realization),'.mat');
-             mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));
-%             str2 = strcat('./',mk,'/',file);
-%             load(str2,'t_rupt'); % reading rupture time to pass to post processor
-%             t_rupt=t_rupt(realization);
+            %t_ruptavg=28.0164; % If simulation data file was not created
+            file = strcat('*rzn',realization)
+            mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));
+            str2 = strcat('./',mk,'/',file);
+            load(str2,t_rupt(realization)); % reading rupture time to pass to post processor
+
             %load(filename)
-            post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_rupt(realization), het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);
+            post_processor_saved(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_rupt(realization), het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);
             move_results(mk)
         end
     end
