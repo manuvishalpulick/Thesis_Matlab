@@ -1,5 +1,5 @@
 
-function [t_rupt,k_dom_sim,t_calc] = flatFilms_repulsion_save(L,N,deltaX,c,Tmp,gx,h_adjusted,A,p,endTime,seN,N_Reals,strhet,realization,animationSkip,continue_index);
+function [t_rupt,k_dom_sim,t_calc] = flatFilms_repulsion_save(L,N,deltaX,c,B,Tmp,gx,h_adjusted,A,p,endTime,seN,N_Reals,strhet,realization,animationSkip,continue_index);
 
 
 format long g

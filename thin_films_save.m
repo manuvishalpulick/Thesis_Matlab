@@ -74,6 +74,8 @@ N = round(L/deltaX);   % adjusted number of grid points -- different from earlie
 deltaT = deltaX^c;          % time step size
 deltaX;
 
+B=0.1;  % Reuplsion constant --> B=0 For No repulsion case
+
 %Please note that domain length has to be a multiple of P_het or else we
 %would not be able to make it periodic
 % If P_het has to be determined by the ratio
@@ -162,21 +164,19 @@ tt = seN*deltaT;                % time between saving two files
                 % Here we get the rupture time of the realization
                 if strcmp(strhet,'homogeneous')== 1
                     
-                   %[t_rupt] = flatFilms_repulsion_gen(L,N,deltaX,c,Tmp,gx,h_adjusted,A,p,endTime,seN,N_Reals,realization);      % for general simulations
-                   %toc
-                   [t_rupt(m), k_dom_sim(m)] =flatFilms_homo(L,N,deltaX,c,Tmp,gx,h_adjusted,A,p,endTime,seN,N_Reals,strhet,m,animationSkip,continue_index);    % For Homogeneous with reuplsion
+                    [t_rupt(m), k_dom_sim(m)] =flatFilms_homo(L,N,deltaX,c,B,Tmp,gx,h_adjusted,A,p,endTime,seN,N_Reals,strhet,m,animationSkip,continue_index);    % For Homogeneous with reuplsion
                     
                 else
         %            t_rupt(m) = flatFilms_het_repulsion_2(L,N,c,Tmp,gx,h_adjusted,A,p,endTime,seN,N_nodes_het,P_het,e);  % For Heterogeneous with reuplsion
         %           t_rupt(m) = flatFilms_het(L,N,c,Tmp,gx,h_adjusted,A,p,endTime,seN);           %For heterogeneous without repulsion    
-                    [t_rupt(m)] = flatFilms_het(L,N,deltaX,c,Tmp,gx,h_adjusted,A,p,endTime,seN,N_nodes_het,P_het,e,continue_index, N_Reals,strhet,m,animationSkip);
+                    [t_rupt(m)] = flatFilms_het(L,N,deltaX,c,B,Tmp,gx,h_adjusted,A,p,endTime,seN,N_nodes_het,P_het,e,continue_index, N_Reals,strhet,m,animationSkip);
                 end
                 t_calc(m) = toc(tFlatfilms_solver);
                 fprintf('Time taken by the flatFilms solver: %d min %f s\n',floor(t_calc(m)/60),mod(t_calc(m),60))
 %                 reali_series(m) = m;                    % to keep a log of the realization (not needed, but I keep it)
 %                 realization = realization + 1;          % counter
                 movefile('*.mat',mk)
-                post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_rupt(m), het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);  
+%                post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_rupt(m), het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);  
             
             end
             %% following is for non-flat simulations (quite similar to the flat ones, except for the boundary conditions
@@ -237,7 +237,7 @@ tt = seN*deltaT;                % time between saving two files
          
         %% store the data (but more importantly the rupture times) into a .mat file, so that there is no further post processing required if we are just looking for T_r
         filename = ['simulationdata_','kappa_',num2str(kappa),'_Lf_',num2str(L),'_N_',num2str(N), '_Tmp_', num2str(Tmp),'.mat'];
-        save(filename,'t_ruptavg','k_dom_sim_avg','S_t_rupt','S_k_dom_sim','t_calcavg','S_t_calc')   % saves the .mat file including all the variable values in a filename of the specified format
+        save(filename,'t_rupt','t_ruptavg','k_dom_sim_avg','S_t_rupt','S_k_dom_sim','t_calcavg','S_t_calc')   % saves the .mat file including all the variable values in a filename of the specified format
         movefile('*.mat',mk)
                               % move all the data files to that directory
         a=0;
@@ -252,21 +252,21 @@ tt = seN*deltaT;                % time between saving two files
         % l_scale = h0_init^2*sqrt(2*pi*gam/A_vw); 
         %continue_index_post =0;
         
-        move_results(mk)
+        move_results(mk,Tmp)
         
         tElapsed_pp = toc(tpp);
         fprintf('Time taken for post processing: %d min %f s\n',floor(tElapsed_pp/60),mod(tElapsed_pp,60))
     else
         for realization = 1:N_Reals  
-            t_rupt(realization)=44.5674; % If simulation data file was not created
-%             file = strcat(strhet,'*rzn',num2str(realization),'.mat');
-             mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));
-%             str2 = strcat('./',mk,'/',file);
-%             load(str2,'t_rupt'); % reading rupture time to pass to post processor
-%             t_rupt=t_rupt(realization);
-            %load(filename)
-            post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_rupt(realization), het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);
-            move_results(mk)
+             %t_rupt(realization)=44.5674; % If simulation data file was not created
+%              filename = ['simulationdata_','kappa_',num2str(kappa),'_Lf_',num2str(L),'_N_',num2str(N), '_Tmp_', num2str(Tmp),'.mat'];
+              mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));
+%              str2 = ['.\',mk,'\',filename];
+%              load(str2); % reading rupture time to pass to post processor
+%              t_rupt=t_rupt(realization);
+%              %load(file)
+             post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);
+             move_results(mk,Tmp)
         end
     end
 

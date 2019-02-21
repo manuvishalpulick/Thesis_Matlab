@@ -1,5 +1,5 @@
 
-function [t_rupt,k_dom_sim,t_calc] = flatFilms_repulsion_save(L,N,deltaX,c,Tmp,gx,h_adjusted,A,p,endTime,seN,N_Reals,strhet,realization,animationSkip,continue_index);
+function [t_rupt,k_dom_sim,t_calc] = flatFilms_repulsion_save(L,N,deltaX,c,B,Tmp,gx,h_adjusted,A,p,endTime,seN,N_Reals,strhet,realization,animationSkip,continue_index);
 
 
 format long g
@@ -332,7 +332,7 @@ k_dom_sim = f(k_dom_index)   % Identifying the dominant wave number in the defin
 % If omega has to be calculated
 %omega_max_sim = k_dom_sim_calc_save(animationSkip,iter,h_save(3:end-2,:),x,deltaX,c,L,time,het,P_het,wave_dom_lsa,N,realization,lin_index,k_dom_sim,e,Tmp)
 
-filename = [strhet,'T_rupt',num2str(t_rupt),'_Lf_',num2str(L),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat']; 
+filename = [strhet,'_Lf_',num2str(L),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat']; 
 
 save(filename,'-v7.3');
 

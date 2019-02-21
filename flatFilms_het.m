@@ -1,5 +1,5 @@
 
-function [t_rupt] = flatFilms_het_repulsion_continuation_save(L,N,deltaX,c,Tmp,gx,h_adjusted,A,p,endTime,seN,N_nodes_het,P_het,e,continue_index, N_Reals,strhet,realization,animationSkip)
+function [t_rupt] = flatFilms_het_repulsion_continuation_save(L,N,deltaX,c,B,Tmp,gx,h_adjusted,A,p,endTime,seN,N_nodes_het,P_het,e,continue_index, N_Reals,strhet,realization,animationSkip)
 
 
 format long g
@@ -74,8 +74,6 @@ format long g
 %|0                                                                                |  
 %|_0                                                                              _| 
 
-
-%deltaX = L/N;                 % grid size
 x = 0:deltaX:L;               % domain of the simulation
 deltaT = deltaX^c;            % time step size
 
@@ -86,14 +84,14 @@ p3 = 1/(deltaX)*sqrt(2*deltaT*Tmp);    % p3 - used for the noise term: Important
 tt = seN*deltaT;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%----------- Setting up the initial conditions ------------%%%
-%P=(N/6*deltaX);
 m=2*pi/(N_nodes_het);
 tInside_solver = tic;
 if continue_index == 0
      k = linspace(1,h_adjusted,h_adjusted);   % index used in vectorizing the code; see the solver; used for counting x
-     %h(1,:) = ones(size(x))+0.001*sin(6.*(x-(L/2)).^2); 
-     % introducing an initial perturbation whichexcites multiple frequencies
-     h(1,:) = ones(size(x))+0.001*sin(x.*0.2); 
+     h(1,:) = ones(size(x))+0.001*sin(6.*(x-(L/2)).^2); 
+     % introducing an initial perturbation which excites specific frequencies
+     %n_in = 6  % no. of waves in 1 L_flat
+     %h(1,:) = ones(size(x))+0.001*sin(x.*(2.*pi/L_flat).*n);  % make sure it is a periodic distrbance to ensure continuity in initiial conditions
      
      h = [h(end-1), h(end), h, h(1), h(2)]';   % add two ghost points each side,
      h_save(:,1) = h;
@@ -109,11 +107,7 @@ if continue_index == 0
     R = zeros(size(x));
     noi1 = zeros(size(x));
     noi2 = zeros(size(x));
-    B=0.1;  % Reuplsion constant --> B=0 For No repulsion case
     
-    % e=0.3;                    %Amplitude of wettability difference
-    % m=2*pi/(205);            %heterogeneity with a period of 205 nodes--> 5 stripes P_het in L --> Phet=12 (Pc from homogeneous simulation k=0.53)
-    % For L=60, we have around 5 dominant wavelengths on it
     
     %% Solver
     rupture=0;              % index for rupture event 
