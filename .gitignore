@@ -1,6 +1,6 @@
 *.fig
 *.txt
 *.jpg
-
+*.mat
 *.avi
 *.asv
