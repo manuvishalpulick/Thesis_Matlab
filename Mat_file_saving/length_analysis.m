@@ -149,7 +149,7 @@ else
 end
 gx = gx_generator(N,L,x);  % generates a matrix that is going to be used when we finally implement noise
 %% Processing parameters
-post_pro=1;                   % if only postprocessing has to be done, set to 1
+post_pro=0;                   % if only postprocessing has to be done, set to 1
 animationSkip = 800;        % To fix after how many time steps should the animation take the next plot values
 continue_index = 0;         % If we want to continue a previous simulation; assign 1 else 0
 continue_index_post = 0;   % If the data files have already been read and saved to a .mat file once, 
@@ -301,21 +301,21 @@ tt = seN*deltaT;                % time between saving two files
         % l_scale = h0_init^2*sqrt(2*pi*gam/A_vw); 
         %continue_index_post =0;
         
-        move_results(mk,Tmp)
+        move_results(mk)
         
         tElapsed_pp = toc(tpp);
         fprintf('Time taken for post processing: %d min %f s\n',floor(tElapsed_pp/60),mod(tElapsed_pp,60))
     else
         for realization = 1:N_Reals  
-            %t_rupt(realization)=44.5674; % If simulation data file was not created
-             file = strcat(strhet,'*rzn',num2str(realization),'.mat');
+            t_rupt(realization)=44.5674; % If simulation data file was not created
+%             file = strcat(strhet,'*rzn',num2str(realization),'.mat');
              mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));
-             str2 = strcat('./',mk,'/',file);
-             load(str2,'t_rupt'); % reading rupture time to pass to post processor
-             t_rupt=t_rupt(realization);
-            load(filename)
+%             str2 = strcat('./',mk,'/',file);
+%             load(str2,'t_rupt'); % reading rupture time to pass to post processor
+%             t_rupt=t_rupt(realization);
+            %load(filename)
             post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_rupt(realization), het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);
-            move_results(mk,Tmp)
+            move_results(mk)
         end
     end
 

@@ -1,16 +1,15 @@
-function post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, het, P_het, wave_dom_lsa, e, Tmp, N_reals,strhet)
+function post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_ruptavg, het, P_het, wave_dom_lsa, e, Tmp, N_reals,strhet)
 
     for realization= 1:N_reals
            t_load= tic;
-           filename = [strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat'];
-           mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));         
+            filename = [strhet,'T_rupt',num2str(t_ruptavg),'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat'];
+           mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));           %mk = strcat(strhet,'T_rupt',num2str(t_ruptavg),'_Lf_',num2str(L_flat),'_N_',num2str(N), '_Tmp_', num2str(Tmp),'P_het', num2str(P_het), 'e', num2str(e))
            str1 = strcat('.\',mk,'\',filename);
            load(str1);
            tElapsed_load=toc(t_load);
            fprintf('\nTime taken to load the results: %d min %f s\n',floor(tElapsed_load/60),mod(tElapsed_load,60));
-           tic
            h_adjusted = N+5;
-           
+
            %% eliminating the ghost points
            h_final = [h_save((3:end-2),:)];
            %h_final = [h((3:end-2),:)];   % If analysis is done on an old
@@ -22,20 +21,20 @@ function post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endT
            %%If energy has to be calculated during post processing; needs
            %%ghost points also to calculate first and last values, so
            %%h_save is passed instead of h_final
-           toc    
-           %[E(:,realization),E_pi(:,realization),E_st(:,realization)]=energy_calc(h_save, x, L_flat, deltaX, c, deltaT, N, q, P_het, e, Tmp, realization,endTime);
+               
+           [E,E_pi,E_st]=energy_calc(h_save, x, L_flat, deltaX, c, deltaT, N, q, P_het, e, Tmp, realization,endTime);
            
            t=[0:deltaT:endTime];
            
         %% function calls
         %% Function for making the plot of minimum height vs time
-            %hmin_evol(h_min,t,realization,q)
+            hmin_evol(h_min,t,realization,q)
         %% to make an animation of the film evolution
             %makeAnimation_det(animationSkip,q,c1,x,L_flat,t_new,het,P_het,e)
         %% to make an animation of the fourier spectrum evolution    
             %makeAnimation_det_fft(animationSkip,q,c1,x,L_flat,t_new,N,P_het,wave_dom,t)
         %% Makes a subplot of both film and structure factor evolution    
-            makeAnimation_comparison(animationSkip,q,h_final,x,L_flat,t,het,P_het,wave_dom_lsa,e,N,realization)
+            %makeAnimation_comparison(animationSkip,q,h_final,x,L_flat,t,het,P_het,wave_dom_lsa,e,N,realization)
         %% to make a plot of the energy evolution and different contributions to the same
             %energy_evol(h_final,E,E_pi,E_st,x,L_flat,t,het,P_het,wave_dom_lsa,e,N,realization,q)
         %% Function to plot and find the maximum growth rate     
@@ -203,8 +202,8 @@ for i = 1:animationSkip:q
         hold on
         cos_values(:) = e.*cos((2*pi*x/P_het)-pi);
         
-        hetcount = (cos_values < 0);  % generates a matrix with ones on more wettable sites
-        hetcount = -1.*hetcount;
+        hetcount = (cos_values > 0);  % generates a matrix with ones on more wettable sites
+        hetcount = 0.001.*hetcount
         plot(x',hetcount,'LineStyle','-','color','red','LineWidth',4)
         xlim([0 L_flat])
         ylim([0 10])

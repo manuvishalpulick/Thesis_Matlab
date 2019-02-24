@@ -1,4 +1,4 @@
-function move_results(mk,Tmp)
+function move_results(mk)
 
 
 
@@ -12,7 +12,7 @@ function move_results(mk,Tmp)
            movefile('Rupture_instant*',mk)                 % move all the image files to that directory 
 %           movefile(strcat('*_',num2str(L_flat),'_*.mat'),mk)                 % move the .mat file to that directory
 %           movefile('wave_num_fig*',mk)                 % move all the wave number energy evolution files to that directory
-          movefile('Energy_evolutionfig*',mk))                 %movee energy plots to mk
+%          movefile('Energy_plot*',mk)                 %movee energy plots to mk
 %          movefile('omegafig*',mk)                 %movee omega plots to mk
           
     else

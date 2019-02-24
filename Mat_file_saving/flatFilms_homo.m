@@ -125,8 +125,7 @@ if continue_index == 0
 
     % introducing an initial perturbation whichexcites multiple frequencies
     %h = ones(size(x))+0.001*sin(6.*(x-(L/2)).^2); 
-    n=6;
-    h = ones(size(x))+0.001.*sin(2.*pi/L.*n.*x);
+    h = ones(size(x))+0.001.*sin(0.2.*x);
     h = [h(end-1), h(end), h, h(1), h(2)]';   % add two ghost points each side, and ensure periodicity employing periodic boundary conditions
     h_save(:,1) = h;
     % Energy of initial film
@@ -333,7 +332,7 @@ k_dom_sim = f(k_dom_index)   % Identifying the dominant wave number in the defin
 % If omega has to be calculated
 %omega_max_sim = k_dom_sim_calc_save(animationSkip,iter,h_save(3:end-2,:),x,deltaX,c,L,time,het,P_het,wave_dom_lsa,N,realization,lin_index,k_dom_sim,e,Tmp)
 
-filename = [strhet,'_Lf_',num2str(L),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat']; 
+filename = [strhet,'T_rupt',num2str(t_rupt),'_Lf_',num2str(L),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat']; 
 
 save(filename,'-v7.3');
 

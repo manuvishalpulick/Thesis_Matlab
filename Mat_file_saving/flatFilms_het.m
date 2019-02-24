@@ -88,17 +88,10 @@ m=2*pi/(N_nodes_het);
 tInside_solver = tic;
 if continue_index == 0
      k = linspace(1,h_adjusted,h_adjusted);   % index used in vectorizing the code; see the solver; used for counting x
-
-     %h(1,:) = ones(size(x))+0.001*sin(6.*(x-(L/2)).^2); 
-     % introducing an initial perturbation whichexcites multiple frequencies
-     n=6;
-     %h = ones(size(x))+0.001.*sin(2.*pi/L.*n.*x);
-
-     %h(1,:) = ones(size(x))+0.001*sin(6.*(x-(L/2)).^2); 
+     h(1,:) = ones(size(x))+0.001*sin(6.*(x-(L/2)).^2); 
      % introducing an initial perturbation which excites specific frequencies
      %n_in = 6  % no. of waves in 1 L_flat
-     h(1,:) = ones(size(x))+0.001*sin(x.*(2.*pi/L_flat).*n);  % make sure it is a periodic distrbance to ensure continuity in initiial conditions
-
+     %h(1,:) = ones(size(x))+0.001*sin(x.*(2.*pi/L_flat).*n);  % make sure it is a periodic distrbance to ensure continuity in initiial conditions
      
      h = [h(end-1), h(end), h, h(1), h(2)]';   % add two ghost points each side,
      h_save(:,1) = h;
@@ -265,7 +258,7 @@ end
 tElapsed_loop = toc(tInside_solver);
 fprintf('\nTime taken to complete %d iterations: %d min %f s\n', iter, floor(tElapsed_loop/60),mod(tElapsed_loop,60));
 
-filename = [strhet,'T_rupt',num2str(t_rupt),'_Lf_',num2str(L),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat']; 
+filename = [strhet,'_Lf_',num2str(L),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat']; 
 
 save(filename,'-v7.3')
 
