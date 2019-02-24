@@ -94,10 +94,10 @@ if continue_index == 0
      n=6;
      %h = ones(size(x))+0.001.*sin(2.*pi/L.*n.*x);
 
-     %h(1,:) = ones(size(x))+0.001*sin(6.*(x-(L/2)).^2); 
+     h(1,:) = ones(size(x))+0.001*sin(6.*(x-(L/2)).^2); 
      % introducing an initial perturbation which excites specific frequencies
      %n_in = 6  % no. of waves in 1 L_flat
-     h(1,:) = ones(size(x))+0.001*sin(x.*(2.*pi/L_flat).*n);  % make sure it is a periodic distrbance to ensure continuity in initiial conditions
+     %h(1,:) = ones(size(x))+0.001*sin(x.*(2.*pi/L_flat).*n);  % make sure it is a periodic distrbance to ensure continuity in initiial conditions
 
      
      h = [h(end-1), h(end), h, h(1), h(2)]';   % add two ghost points each side,

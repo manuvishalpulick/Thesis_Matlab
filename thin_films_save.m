@@ -13,7 +13,7 @@ colour = ['r','g','b','c','b'];
 wave_dom_lsa=9.54;   % Prediction from theory  
 
 e= [ 0,0.05,0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.9];
-P_het=4; 
+P_het_array= [4,5,6]; 
 Pc = wave_dom_lsa./sqrt(2);     % Critical wavelength from theory
 
 %% Simulation parameters
@@ -27,7 +27,7 @@ Pc = wave_dom_lsa./sqrt(2);     % Critical wavelength from theory
 t_ruptavg = zeros(1,max(size(e)));
 t_calc_avg = zeros(1,max(size(e)));
 
-for P_het_i = 1:3
+for P_het_i = 1:9
     P_het = P_het_array(P_het_i);
     ratio_het = P_het/Pc; %Ratio of heterogeneity wrt homogeneous critical wavelength
   for im = 2:7 %max(size(e)) 
