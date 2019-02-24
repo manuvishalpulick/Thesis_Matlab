@@ -11,10 +11,10 @@ marker = ['*','o','+','d','.'];
 colour = ['r','g','b','c','b'];
 %% initialization of heterogeneous parameters
 wave_dom_lsa=9.54;   % Prediction from theory  
-e= [ 0,0.05,0.1,0.3,0.4,0.5,0.6,0.7];
-P_het=0; 
+e= [ 0,0.05,0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.9];
+P_het_array= [4,5,6]; 
 Pc = wave_dom_lsa./sqrt(2);     % Critical wavelength from theory
-ratio_het = P_het/Pc;          % Ratio of Phet:Pc
+
 %% Simulation parameters
 
     c=2.75;
@@ -25,7 +25,10 @@ ratio_het = P_het/Pc;          % Ratio of Phet:Pc
 
 t_ruptavg = zeros(1,max(size(e)));
 t_calc_avg = zeros(1,max(size(e)));
-  for im = 1:1 %max(size(e)) 
+for P_het_i = 1:3
+    P_het = P_het_array(P_het_i);
+    ratio_het = P_het/Pc; %Ratio of heterogeneity wrt homogeneous critical wavelength
+  for im = 2:7 %max(size(e)) 
       if e == 0.0
             strhet='homogeneous';
             het=0;
@@ -46,14 +49,15 @@ figure
 plot(e,t_ruptavg,'b')
 xlabel('Amplitude of heterogeneity','Fontsize',10)
 ylabel('Rupture time','Fontsize',10)
-title('Amplitude of wettability vs Ruptute time','Fontsize',10)
-savefig('rupture_timeplot.fig')
+title('Amplitude of wettability vs Rupture time','Fontsize',10)
+savefig(strcat('rupture_timeplot_P_het:Pc_',ratio_het,'.fig'))
 figure
 plot(e,t_calc_avg,'b')
 xlabel('Amplitude of heterogeneity','Fontsize',10)
 ylabel('Simulation time','Fontsize',10)
 title('Amplitude of wettability vs Simulation time','Fontsize',10)  
-savefig('sim_timeplot.fig')
+savefig(strcat('sim_timeplot_P_het:Pc_',ratio_het,'.fig'))
+end
 end
 
 function [t_ruptavg ,t_calcavg] = thin_films(L_flat,deltaX,c,P_het,e,Tmp,wave_dom_lsa)
@@ -98,7 +102,7 @@ else
 end
 gx = gx_generator(N,L,x);  % generates a matrix that is going to be used when we finally implement noise
 %% Processing parameters
-post_pro=1;                   % if only postprocessing has to be done, set to 1
+post_pro=0;                   % if only postprocessing has to be done, set to 1
 animationSkip = 800;        % To fix after how many time steps should the animation take the next plot values
 continue_index = 0;         % If we want to continue a previous simulation; assign 1 else 0
 continue_index_post = 0;   % If the data files have already been read and saved to a .mat file once, 
@@ -176,7 +180,7 @@ tt = seN*deltaT;                % time between saving two files
 %                 reali_series(m) = m;                    % to keep a log of the realization (not needed, but I keep it)
 %                 realization = realization + 1;          % counter
                 movefile('*.mat',mk)
-                post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_rupt(m), het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);  
+                
             
             end
             %% following is for non-flat simulations (quite similar to the flat ones, except for the boundary conditions
@@ -221,7 +225,7 @@ tt = seN*deltaT;                % time between saving two files
 
          if het == 0
              k_dom_sim_avg = mean(k_dom_sim);
-             fprintf('dom. wave number for domain %d, P_het %d, e %d is %d\n',L_flat,P_het,e, k_dom_simavg)
+             fprintf('dom. wave number for domain %d, P_het %d, e %d is %d\n',L_flat,P_het,e, k_dom_sim_avg)
              S_k_dom_sim = std(k_dom_sim);
              fprintf('Std. dav. of dom. wave number for domain %d, P_het %d, e %d is %d\n',L_flat,P_het,e, S_k_dom_sim)
 %              omega_max_sim_avg = mean(omega_max_sim);
@@ -251,8 +255,8 @@ tt = seN*deltaT;                % time between saving two files
         % t_scale = 12*pi^2*visc*gam*h0_init^5/A_vw^2;
         % l_scale = h0_init^2*sqrt(2*pi*gam/A_vw); 
         %continue_index_post =0;
-        
-        move_results(mk)
+        %post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_ruptavg, het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);  
+        %move_results(mk)
         
         tElapsed_pp = toc(tpp);
         fprintf('Time taken for post processing: %d min %f s\n',floor(tElapsed_pp/60),mod(tElapsed_pp,60))
