@@ -11,10 +11,12 @@ marker = ['*','o','+','d','.'];
 colour = ['r','g','b','c','b'];
 %% initialization of heterogeneous parameters
 wave_dom_lsa=9.54;   % Prediction from theory  
-e= [ 0,0.05,0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95];
-P_het=6; 
+
+e= [ 0,0.01,0.02,0.03,0.05,0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95];
+P_het_array= [12,6]; 
+
 Pc = wave_dom_lsa./sqrt(2);     % Critical wavelength from theory
-ratio_het = P_het/Pc;          % Ratio of Phet:Pc
+
 %% Simulation parameters
 
     c=2.75;
@@ -25,7 +27,14 @@ ratio_het = P_het/Pc;          % Ratio of Phet:Pc
 
 t_ruptavg = zeros(1,max(size(e)));
 t_calc_avg = zeros(1,max(size(e)));
-  for im = 2 : max(size(e)) 
+
+
+
+for P_het_i = 1:1
+    P_het = P_het_array(P_het_i);
+    ratio_het = P_het/Pc; %Ratio of heterogeneity wrt homogeneous critical wavelength
+  for im = 2:4 %max(size(e)) 
+
       if e == 0.0
             strhet='homogeneous';
             het=0;
@@ -46,14 +55,15 @@ figure
 plot(e,t_ruptavg,'b')
 xlabel('Amplitude of heterogeneity','Fontsize',10)
 ylabel('Rupture time','Fontsize',10)
-title('Amplitude of wettability vs Ruptute time','Fontsize',10)
-savefig('rupture_timeplot.fig')
+title('Amplitude of wettability vs Rupture time','Fontsize',10)
+savefig(strcat('rupture_timeplot_P_het:Pc_',ratio_het,'.fig'))
 figure
 plot(e,t_calc_avg,'b')
 xlabel('Amplitude of heterogeneity','Fontsize',10)
 ylabel('Simulation time','Fontsize',10)
 title('Amplitude of wettability vs Simulation time','Fontsize',10)  
-savefig('sim_timeplot.fig')
+savefig(strcat('sim_timeplot_P_het:Pc_',ratio_het,'.fig'))
+end
 end
 
 function [t_ruptavg ,t_calcavg] = thin_films(L_flat,deltaX,c,P_het,e,Tmp,wave_dom_lsa)
@@ -106,15 +116,17 @@ continue_index = 0;         % If we want to continue a previous simulation; assi
 continue_index_post = 0;   % If the data files have already been read and saved to a .mat file once, 
 %set to 1 to avoid reading them again 
 % endTime = 45;          % end time of a realization
-if Tmp == 0   
+if Tmp == 0 
+    strTmp = 'Deterministic';
     if e < 0.1 && e > 0
-        endTime = 40;          % experimentation
+        endTime = 45;          % experimentation
     elseif e ==0
         endTime = 60;
     else
         endTime = 20;
     end
 else
+    strTmp = 'Stochastic';
     if e == 0
         endTime = 60;          % experimentation
     else
@@ -175,9 +187,7 @@ tt = seN*deltaT;                % time between saving two files
                 fprintf('Time taken by the flatFilms solver: %d min %f s\n',floor(t_calc(m)/60),mod(t_calc(m),60))
 %                 reali_series(m) = m;                    % to keep a log of the realization (not needed, but I keep it)
 %                 realization = realization + 1;          % counter
-                movefile('*.mat',mk)
-%                post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_rupt(m), het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);  
-            
+                movefile('*.mat',mk)            
             end
             %% following is for non-flat simulations (quite similar to the flat ones, except for the boundary conditions
         else
@@ -221,7 +231,7 @@ tt = seN*deltaT;                % time between saving two files
 
          if het == 0
              k_dom_sim_avg = mean(k_dom_sim);
-             fprintf('dom. wave number for domain %d, P_het %d, e %d is %d\n',L_flat,P_het,e, k_dom_simavg)
+             fprintf('dom. wave number for domain %d, P_het %d, e %d is %d\n',L_flat,P_het,e, k_dom_sim_avg)
              S_k_dom_sim = std(k_dom_sim);
              fprintf('Std. dav. of dom. wave number for domain %d, P_het %d, e %d is %d\n',L_flat,P_het,e, S_k_dom_sim)
 %              omega_max_sim_avg = mean(omega_max_sim);
@@ -238,8 +248,8 @@ tt = seN*deltaT;                % time between saving two files
         %% store the data (but more importantly the rupture times) into a .mat file, so that there is no further post processing required if we are just looking for T_r
         filename = ['simulationdata_','kappa_',num2str(kappa),'_Lf_',num2str(L),'_N_',num2str(N), '_Tmp_', num2str(Tmp),'.mat'];
         save(filename,'t_rupt','t_ruptavg','k_dom_sim_avg','S_t_rupt','S_k_dom_sim','t_calcavg','S_t_calc')   % saves the .mat file including all the variable values in a filename of the specified format
-        movefile('*.mat',mk)
-                              % move all the data files to that directory
+        movefile('*.mat',mk)    % move all the data files to that directory
+        movefile('mk',strTmp)
         a=0;
         R_f = 65e-6;                    % radius of flat surface
         h0_init = 150e-9;                % initial height =150nm
@@ -251,18 +261,23 @@ tt = seN*deltaT;                % time between saving two files
         % t_scale = 12*pi^2*visc*gam*h0_init^5/A_vw^2;
         % l_scale = h0_init^2*sqrt(2*pi*gam/A_vw); 
         %continue_index_post =0;
-        
+
         %move_results(mk,Tmp)
         
+
+
+        %post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_ruptavg, het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);         
+        %move_results(mk,Tmp)
+
         tElapsed_pp = toc(tpp);
         fprintf('Time taken for post processing: %d min %f s\n',floor(tElapsed_pp/60),mod(tElapsed_pp,60))
     else
         for realization = 1:N_Reals  
              %t_rupt(realization)=44.5674; % If simulation data file was not created
-%              filename = ['simulationdata_','kappa_',num2str(kappa),'_Lf_',num2str(L),'_N_',num2str(N), '_Tmp_', num2str(Tmp),'.mat'];
+              filename = ['simulationdata_','kappa_',num2str(kappa),'_Lf_',num2str(L),'_N_',num2str(N), '_Tmp_', num2str(Tmp),'.mat'];
               mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));
-%              str2 = ['.\',mk,'\',filename];
-%              load(str2); % reading rupture time to pass to post processor
+              str2 = ['.\',mk,'\',filename];
+              load(str2); % reading rupture time to pass to post processor
 %              t_rupt=t_rupt(realization);
 %              %load(file)
              post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);

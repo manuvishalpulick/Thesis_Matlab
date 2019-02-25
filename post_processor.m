@@ -23,7 +23,7 @@ function post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endT
            %%ghost points also to calculate first and last values, so
            %%h_save is passed instead of h_final
            toc    
-           %[E(:,realization),E_pi(:,realization),E_st(:,realization)]=energy_calc(h_save, x, L_flat, deltaX, c, deltaT, N, q, P_het, e, Tmp, realization,endTime);
+           [E(:,realization),E_pi(:,realization),E_st(:,realization)]=energy_calc(h_save, x, L_flat, deltaX, c, deltaT, N, q, P_het, e, Tmp, realization,endTime);
            
            t=[0:deltaT:endTime];
            
