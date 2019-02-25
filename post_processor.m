@@ -2,7 +2,8 @@ function post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endT
 
     for realization= 1:N_reals
            t_load= tic;
-           filename = [strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat'];
+           %filename = [strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat'];
+           filename = [strhet,'T_rupt0','_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat'];
            mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));         
            str1 = strcat('.\',mk,'\',filename);
            load(str1);
@@ -18,12 +19,14 @@ function post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endT
            q = size(h_final);  % t(q) = endTime if the simulation was stable and ran till endTime
            % q is used to prevent errors if the simulation was not stable
            q=q(2);
-           
+           E=zeros(N_reals,q);
+           E_pi=zeros(N_reals,q);
+           E_st=zeros(N_reals,q);
            %%If energy has to be calculated during post processing; needs
            %%ghost points also to calculate first and last values, so
            %%h_save is passed instead of h_final
            toc    
-           [E(:,realization),E_pi(:,realization),E_st(:,realization)]=energy_calc(h_save, x, L_flat, deltaX, c, deltaT, N, q, P_het, e, Tmp, realization,endTime);
+           [E(realization,:),E_pi(realization,:),E_st(realization,:)]=energy_calc(h_save, x, L_flat, deltaX, c, deltaT, N, q, P_het, e, Tmp, realization,endTime);
            
            t=[0:deltaT:endTime];
            
