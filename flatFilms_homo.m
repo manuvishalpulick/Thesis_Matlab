@@ -125,7 +125,8 @@ if continue_index == 0
 
     % introducing an initial perturbation whichexcites multiple frequencies
     %h = ones(size(x))+0.001*sin(6.*(x-(L/2)).^2); 
-    h = ones(size(x))+0.001.*sin(0.2.*x);
+    n=6;
+    h = ones(size(x))+0.001.*sin(2.*pi/L.*n.*x);
     h = [h(end-1), h(end), h, h(1), h(2)]';   % add two ghost points each side, and ensure periodicity employing periodic boundary conditions
     h_save(:,1) = h;
     % Energy of initial film
