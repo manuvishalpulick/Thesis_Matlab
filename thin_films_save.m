@@ -11,8 +11,8 @@ marker = ['*','o','+','d','.'];
 colour = ['r','g','b','c','b'];
 %% initialization of heterogeneous parameters
 wave_dom_lsa=9.54;   % Prediction from theory  
-e= [ 0,0.05,0.1,0.3,0.4,0.5,0.6,0.7];
-P_het=4; 
+e= [ 0,0.05,0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95];
+P_het=6; 
 Pc = wave_dom_lsa./sqrt(2);     % Critical wavelength from theory
 ratio_het = P_het/Pc;          % Ratio of Phet:Pc
 %% Simulation parameters
@@ -25,7 +25,7 @@ ratio_het = P_het/Pc;          % Ratio of Phet:Pc
 
 t_ruptavg = zeros(1,max(size(e)));
 t_calc_avg = zeros(1,max(size(e)));
-  for im = 5:5 %max(size(e)) 
+  for im = 2 : max(size(e)) 
       if e == 0.0
             strhet='homogeneous';
             het=0;
@@ -100,7 +100,7 @@ else
 end
 gx = gx_generator(N,L,x);  % generates a matrix that is going to be used when we finally implement noise
 %% Processing parameters
-post_pro=1;                   % if only postprocessing has to be done, set to 1
+post_pro=0;                   % if only postprocessing has to be done, set to 1
 animationSkip = 800;        % To fix after how many time steps should the animation take the next plot values
 continue_index = 0;         % If we want to continue a previous simulation; assign 1 else 0
 continue_index_post = 0;   % If the data files have already been read and saved to a .mat file once, 
@@ -252,7 +252,7 @@ tt = seN*deltaT;                % time between saving two files
         % l_scale = h0_init^2*sqrt(2*pi*gam/A_vw); 
         %continue_index_post =0;
         
-        move_results(mk,Tmp)
+        %move_results(mk,Tmp)
         
         tElapsed_pp = toc(tpp);
         fprintf('Time taken for post processing: %d min %f s\n',floor(tElapsed_pp/60),mod(tElapsed_pp,60))

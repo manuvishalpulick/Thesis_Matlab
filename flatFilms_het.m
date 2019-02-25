@@ -258,7 +258,7 @@ end
 tElapsed_loop = toc(tInside_solver);
 fprintf('\nTime taken to complete %d iterations: %d min %f s\n', iter, floor(tElapsed_loop/60),mod(tElapsed_loop,60));
 
-filename = [strhet,'T_rupt',num2str(t_rupt),'_Lf_',num2str(L),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat']; 
+filename = [strhet,'_Lf_',num2str(L),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat']; 
 
 save(filename,'-v7.3')
 
