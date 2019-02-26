@@ -2,13 +2,17 @@ function post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endT
 
     for realization= 1:N_reals
            t_load= tic;
-           %filename = [strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat'];
-           filename = [strhet,'T_rupt0','_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat'];
+           filename = [strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat'];
+           
+           %%%%%%%%%%% Only to be used to postprocess old data where T_rupt was a part of the filename%%%%%%%%%%%%%%%%%
+           %filename = [strhet,'T_rupt0','_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e),'rzn',num2str(realization),'.mat'];
+           %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+           
            mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));         
            str1 = strcat('.\',mk,'\',filename);
            load(str1);
            tElapsed_load=toc(t_load);
-           fprintf('\nTime taken to load the results: %d min %f s\n',floor(tElapsed_load/60),mod(tElapsed_load,60));
+           fprintf('\nTime taken to load the results for realization &d: %d min %f s\n',floor(tElapsed_load/60),mod(tElapsed_load,60),realization);
            tic
            h_adjusted = N+5;
            
