@@ -12,8 +12,8 @@ colour = ['r','g','b','c','b'];
 %% initialization of heterogeneous parameters
 wave_dom_lsa=9.54;   % Prediction from theory  
 
-e= [ 0,0.05,0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.9];
-P_het_array= [4,5,6]; 
+e= [ 0,0.05,0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95];
+P_het_array= [4,5]; 
 Pc = wave_dom_lsa./sqrt(2);     % Critical wavelength from theory
 
 %% Simulation parameters
@@ -27,10 +27,10 @@ Pc = wave_dom_lsa./sqrt(2);     % Critical wavelength from theory
 t_ruptavg = zeros(1,max(size(e)));
 t_calc_avg = zeros(1,max(size(e)));
 
-for P_het_i = 1:9
+for P_het_i = 1:max(size(P_het_array))
     P_het = P_het_array(P_het_i);
     ratio_het = P_het/Pc; %Ratio of heterogeneity wrt homogeneous critical wavelength
-  for im = 2:7 %max(size(e)) 
+  for im = 3:7%max(size(e)) 
       if e == 0.0
             strhet='homogeneous';
             het=0;
@@ -89,6 +89,9 @@ B=0.1;  % Reuplsion constant --> B=0 For No repulsion case
 
 N_nodes_het = round(N/(L_flat/P_het));  % No of nodes in one heterogeneous stripe
 
+if max(size(x)) < N+1  % For the case when rounding L/N causes problems with the size of x
+    x = [x L_flat];
+end
 
 if e == 0.0
             strhet='homogeneous';
@@ -106,7 +109,7 @@ else
 end
 gx = gx_generator(N,L,x);  % generates a matrix that is going to be used when we finally implement noise
 %% Processing parameters
-post_pro=0;                   % if only postprocessing has to be done, set to 1
+post_pro=1;                   % if only postprocessing has to be done, set to 1
 animationSkip = 800;        % To fix after how many time steps should the animation take the next plot values
 continue_index = 0;         % If we want to continue a previous simulation; assign 1 else 0
 continue_index_post = 0;   % If the data files have already been read and saved to a .mat file once, 
@@ -170,18 +173,18 @@ tt = seN*deltaT;                % time between saving two files
                 % Here we get the rupture time of the realization
                 if strcmp(strhet,'homogeneous')== 1
                     
-                    [t_rupt(m), k_dom_sim(m)] =flatFilms_homo(L,N,deltaX,c,B,Tmp,gx,h_adjusted,A,p,endTime,seN,N_Reals,strhet,m,animationSkip,continue_index);    % For Homogeneous with reuplsion
+                    [t_rupt(m), k_dom_sim(m)] =flatFilms_homo(L,N,deltaX,x,c,B,Tmp,gx,h_adjusted,A,p,endTime,seN,N_Reals,strhet,m,animationSkip,continue_index);    % For Homogeneous with reuplsion
                     
                 else
         %            t_rupt(m) = flatFilms_het_repulsion_2(L,N,c,Tmp,gx,h_adjusted,A,p,endTime,seN,N_nodes_het,P_het,e);  % For Heterogeneous with reuplsion
         %           t_rupt(m) = flatFilms_het(L,N,c,Tmp,gx,h_adjusted,A,p,endTime,seN);           %For heterogeneous without repulsion    
-                    [t_rupt(m)] = flatFilms_het(L,N,deltaX,c,B,Tmp,gx,h_adjusted,A,p,endTime,seN,N_nodes_het,P_het,e,continue_index, N_Reals,strhet,m,animationSkip);
+                    [t_rupt(m)] = flatFilms_het(L,N,deltaX,x,c,B,Tmp,gx,h_adjusted,A,p,endTime,seN,N_nodes_het,P_het,e,continue_index, N_Reals,strhet,m,animationSkip);
                 end
                 t_calc(m) = toc(tFlatfilms_solver);
                 fprintf('Time taken by the flatFilms solver: %d min %f s\n',floor(t_calc(m)/60),mod(t_calc(m),60))
 %                 reali_series(m) = m;                    % to keep a log of the realization (not needed, but I keep it)
 %                 realization = realization + 1;          % counter
-                movefile('*.mat',mk)            
+                %movefile('*.mat',mk)            
             end
             %% following is for non-flat simulations (quite similar to the flat ones, except for the boundary conditions
         else
@@ -257,16 +260,16 @@ tt = seN*deltaT;                % time between saving two files
         %continue_index_post =0;
 
         %post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_ruptavg, het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);         
-        move_results(mk,Tmp)
+        %move_results(mk,Tmp)
         tElapsed_pp = toc(tpp);
         fprintf('Time taken for post processing: %d min %f s\n',floor(tElapsed_pp/60),mod(tElapsed_pp,60))
     else
         for realization = 1:N_Reals  
              %t_rupt(realization)=44.5674; % If simulation data file was not created
-%              filename = ['simulationdata_','kappa_',num2str(kappa),'_Lf_',num2str(L),'_N_',num2str(N), '_Tmp_', num2str(Tmp),'.mat'];
+              filename = ['simulationdata_','kappa_',num2str(kappa),'_Lf_',num2str(L),'_N_',num2str(N), '_Tmp_', num2str(Tmp),'.mat'];
               mk = strcat(strhet,'_Lf_',num2str(L_flat),'_deltaX_',num2str(deltaX),'_c_',num2str(c), '_Tmp_', num2str(Tmp),'_P_het_', num2str(P_het), '_e_', num2str(e));
-%              str2 = ['.\',mk,'\',filename];
-%              load(str2); % reading rupture time to pass to post processor
+              str2 = ['.\',mk,'\',filename];
+              load(str2); % reading rupture time to pass to post processor
 %              t_rupt=t_rupt(realization);
 %              %load(file)
              post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);

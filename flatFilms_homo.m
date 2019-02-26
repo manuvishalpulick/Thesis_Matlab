@@ -1,5 +1,5 @@
 
-function [t_rupt,k_dom_sim,t_calc] = flatFilms_repulsion_save(L,N,deltaX,c,B,Tmp,gx,h_adjusted,A,p,endTime,seN,N_Reals,strhet,realization,animationSkip,continue_index);
+function [t_rupt,k_dom_sim,t_calc] = flatFilms_repulsion_save(L,N,deltaX,x,c,B,Tmp,gx,h_adjusted,A,p,endTime,seN,N_Reals,strhet,realization,animationSkip,continue_index);
 
 
 format long g
@@ -78,7 +78,7 @@ e = 0;
 tInside_solver = tic;
 %deltaX = L/N;                 % grid size
 if continue_index == 0
-    x = 0:deltaX:L;               % domain of the simulation
+    %x = 0:deltaX:L;               % domain of the simulation
     deltaT = deltaX^c            % time step size
     flag = 1;                     % counter for storing the data files
     p1 = deltaT/(deltaX^2);       % p1 - used in the explicit part

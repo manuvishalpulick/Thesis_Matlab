@@ -1,5 +1,5 @@
 
-function [t_rupt] = flatFilms_het_repulsion_continuation_save(L,N,deltaX,c,B,Tmp,gx,h_adjusted,A,p,endTime,seN,N_nodes_het,P_het,e,continue_index, N_Reals,strhet,realization,animationSkip)
+function [t_rupt] = flatFilms_het_repulsion_continuation_save(L,N,deltaX,x,c,B,Tmp,gx,h_adjusted,A,p,endTime,seN,N_nodes_het,P_het,e,continue_index, N_Reals,strhet,realization,animationSkip)
 
 
 format long g
@@ -74,7 +74,7 @@ format long g
 %|0                                                                                |  
 %|_0                                                                              _| 
 
-x = 0:deltaX:L;               % domain of the simulation
+%x = 0:deltaX:L;               % domain of the simulation
 deltaT = deltaX^c;            % time step size
 
 p1 = deltaT/(deltaX^2);       % p1 - used in the explicit part
