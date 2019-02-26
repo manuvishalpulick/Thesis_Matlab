@@ -12,8 +12,14 @@ colour = ['r','g','b','c','b'];
 %% initialization of heterogeneous parameters
 wave_dom_lsa=9.54;   % Prediction from theory  
 
+
 e= [ 0,0.05,0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95];
 P_het_array= [4,5]; 
+
+e= [ 0,0.01,0.02,0.03,0.05,0.1,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95];
+P_het_array= [12,6]; 
+
+
 Pc = wave_dom_lsa./sqrt(2);     % Critical wavelength from theory
 
 %% Simulation parameters
@@ -26,6 +32,7 @@ Pc = wave_dom_lsa./sqrt(2);     % Critical wavelength from theory
 
 t_ruptavg = zeros(1,max(size(e)));
 t_calc_avg = zeros(1,max(size(e)));
+
 
 for P_het_i = 1:max(size(P_het_array))
     P_het = P_het_array(P_het_i);
@@ -109,21 +116,23 @@ else
 end
 gx = gx_generator(N,L,x);  % generates a matrix that is going to be used when we finally implement noise
 %% Processing parameters
-post_pro=1;                   % if only postprocessing has to be done, set to 1
+post_pro=0;                   % if only postprocessing has to be done, set to 1
 animationSkip = 800;        % To fix after how many time steps should the animation take the next plot values
 continue_index = 0;         % If we want to continue a previous simulation; assign 1 else 0
 continue_index_post = 0;   % If the data files have already been read and saved to a .mat file once, 
 %set to 1 to avoid reading them again 
 % endTime = 45;          % end time of a realization
-if Tmp == 0   
+if Tmp == 0 
+    strTmp = 'Deterministic';
     if e < 0.1 && e > 0
-        endTime = 40;          % experimentation
+        endTime = 45;          % experimentation
     elseif e ==0
         endTime = 60;
     else
         endTime = 20;
     end
 else
+    strTmp = 'Stochastic';
     if e == 0
         endTime = 60;          % experimentation
     else
@@ -245,8 +254,8 @@ tt = seN*deltaT;                % time between saving two files
         %% store the data (but more importantly the rupture times) into a .mat file, so that there is no further post processing required if we are just looking for T_r
         filename = ['simulationdata_','kappa_',num2str(kappa),'_Lf_',num2str(L),'_N_',num2str(N), '_Tmp_', num2str(Tmp),'.mat'];
         save(filename,'t_rupt','t_ruptavg','k_dom_sim_avg','S_t_rupt','S_k_dom_sim','t_calcavg','S_t_calc')   % saves the .mat file including all the variable values in a filename of the specified format
-        movefile('*.mat',mk)
-                              % move all the data files to that directory
+        movefile('*.mat',mk)    % move all the data files to that directory
+        movefile('mk',strTmp)
         a=0;
         R_f = 65e-6;                    % radius of flat surface
         h0_init = 150e-9;                % initial height =150nm
@@ -258,6 +267,10 @@ tt = seN*deltaT;                % time between saving two files
         % t_scale = 12*pi^2*visc*gam*h0_init^5/A_vw^2;
         % l_scale = h0_init^2*sqrt(2*pi*gam/A_vw); 
         %continue_index_post =0;
+
+        %move_results(mk,Tmp)
+        
+
 
         %post_processor(animationSkip, x, tt, L_flat, deltaX, c, deltaT, N, endTime, t_ruptavg, het, P_het, wave_dom_lsa, e, Tmp, N_Reals,strhet);         
         %move_results(mk,Tmp)
